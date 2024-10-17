@@ -19,16 +19,31 @@ model User {
   id        String      @id @default(uuid())
   email     String
   provider  Provider
-  role      Role
+  streams   Stream[]
+  upvote    Upvote[]
 }
 
 
 // Stream Schema for Postgres
 model Stream {
-  id        String      @id   @default(uuid())
-  type      StreamType
-  active    Boolean     @default(true)
-  upvotes   Int
+  id          String      @id   @default(uuid())
+  type        StreamType
+  url         String
+  extractedId String
+  active      Boolean     @default(true)
+  userId      String
+  upvote      Upvote[]
+  user        User        @relation(fields: [userId], references: [id])
+}
+
+// Upvote Schema for postgres
+model Upvote {
+  id          String      @id @default(uuid())
+  userId      String
+  streamId    String
+  user        User        @relation(fields: [userId], references: [id])
+  stream      Stream      @relation(fields: [streamId], references: [id])
+  @@unique([userId, streamId])
 }
 
 
@@ -48,7 +63,7 @@ enum Provider{
 }
 
 // Role enums
-enum Role{
-  Streamer
-  EndUser
-}
+// enum Role{
+//   Streamer
+//   EndUser
+// }
